@@ -1,7 +1,7 @@
 [package]
 name = "entitydata"
 version = "0.0.1"
-authors = ["ganmin <jxz_211@163.com>"]
+authors = ["jxz_211 <jxz_211@163.com>"]
 edition = "2018"
 
 
