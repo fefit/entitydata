@@ -2075,43 +2075,37 @@ impl fmt::Display for EntityDisplay {
         let output_dependence = r##"
 use lazy_static::lazy_static;
 use std::collections::HashMap;
-pub type FirstLetterPosition = HashMap<u8, (usize, usize)>;
-pub type EntityItem = (Vec<u8>, u32);
+use crate::types::{ Byte, Bytes };
+pub type FirstLetterRange = HashMap<Byte, (usize, usize)>;
+pub type EntityPointPair = (Bytes, u32);
+pub type EntityCharPair = (Bytes, char);
 "##;
         result.push_str(output_dependence);
         // output entities
         result.push_str("/// https://dev.w3.org/html5/html-author/charref \n");
         result.push_str(&format!(
-            "pub const ENTITIES: [EntityItem; {}] = [\n",
+            "pub const ENTITIES: [EntityPointPair; {}] = [\n",
             ENTITIES.len()
         ));
         for entity in &ENTITIES {
-            result.push_str(&format!(
-                "\t(vec!{:?}, 0x{:x}),\n",
-                entity.0.as_bytes(),
-                entity.1
-            ));
+            result.push_str(&format!("\t(b{:?}, 0x{:x}),\n", entity.0, entity.1));
         }
         result.push_str("];\n");
         // output ordered entities entities
         result.push_str("/// Entities ordered by letters \n");
         result.push_str(&format!(
-            "pub const LETTER_ORDERED_ENTITIES: [EntityItem; {}] = [\n",
+            "pub const LETTER_ORDERED_ENTITIES: [EntityCharPair; {}] = [\n",
             self.entities.len()
         ));
         for entity in &self.entities {
-            result.push_str(&format!(
-                "\t(vec!{:?}, 0x{:x}),\n",
-                entity.0.as_bytes(),
-                entity.1
-            ));
+            result.push_str(&format!("\t(b{:?}, '\\u{{{:x}}}'),\n", entity.0, entity.1));
         }
         result.push_str("];\n");
         // output code positions
         result.push_str("lazy_static!{\n");
-        result.push_str("\tpub static ref FIRST_LETTER_POSITION: FirstLetterPosition = {\n");
+        result.push_str("\tpub static ref FIRST_LETTER_POSITION: FirstLetterRange = {\n");
         result.push_str(&format!(
-            "\t\tlet mut data: FirstLetterPosition = HashMap::with_capacity({});\n",
+            "\t\tlet mut data: FirstLetterRange = HashMap::with_capacity({});\n",
             self.positions.len()
         ));
         for (ch, pos) in &self.positions {
